@@ -1,12 +1,11 @@
 package med.voll.api.endereco;
 
-import jakarta.persistence.Embedded;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Embedded
+@Embeddable
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
