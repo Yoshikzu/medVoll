@@ -1,6 +1,6 @@
 package med.voll.api.controller;
 
-import med.voll.api.domain.paciente.*;
+import jakarta.validation.Valid;
 import med.voll.api.domain.paciente.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,8 @@ public class PacienteController {
     private PacienteRepository repository;
 
     @PostMapping
-    public ResponseEntity cadastrar(@RequestBody DadosCadastroPaciente dados, UriComponentsBuilder uriBuilder){
+    @Transactional
+    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroPaciente dados, UriComponentsBuilder uriBuilder){
         var paciente = new Paciente(dados);
         repository.save(paciente);
         var uri = uriBuilder.path("/pacientes/{id}").buildAndExpand(paciente.getId()).toUri();
