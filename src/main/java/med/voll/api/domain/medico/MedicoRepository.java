@@ -16,7 +16,9 @@ public interface MedicoRepository extends JpaRepository<Medico,Long> {
             m.ativo = 1 AND 
             m.especialidade = :especialidade AND 
             m.id not IN (
-            SELECT c.medico.id FROM Consulta c WHERE c.data = :data) 
+            SELECT c.medico.id FROM Consulta c WHERE c.data = :data
+            and
+            c.motivoCancelamento is null) 
             ORDER BY rand()
              LIMIT 1""")
     Medico escolherMedicoAleatorioLivreNaData(Especialidade especialidade, LocalDateTime data);
