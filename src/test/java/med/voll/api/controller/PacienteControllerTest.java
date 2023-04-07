@@ -3,6 +3,10 @@ package med.voll.api.controller;
 import med.voll.api.domain.endereco.DadosEndereco;
 import med.voll.api.domain.endereco.Endereco;
 import med.voll.api.domain.medico.*;
+import med.voll.api.domain.paciente.DadosCadastroPaciente;
+import med.voll.api.domain.paciente.DadosDetalhamentoPaciente;
+import med.voll.api.domain.paciente.Paciente;
+import med.voll.api.domain.paciente.PacienteRepository;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,34 +19,35 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
-class MedicoControllerTest {
+class PacienteControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private JacksonTester<DadosCadastroMedico> dadosCadastroMedicoJson;
+    private JacksonTester<DadosCadastroPaciente> dadosCadastroPacienteJson;
 
     @Autowired
-    private JacksonTester<DadosDetalhamentoMedico> dadosDetalhamentoMedicoJson;
+    private JacksonTester<DadosDetalhamentoPaciente> dadosDetalhamentoPacienteJson;
 
     @MockBean
-    private MedicoRepository repository;
+    private PacienteRepository repository;
 
     @Test
     @DisplayName("Deveria devolver codigo http 400 quando informacoes estao invalidas")
     @WithMockUser
     void cadastrar_cenario1() throws Exception {
         var response = mvc
-                .perform(post("/medicos"))
+                .perform(post("/pacientes"))
                 .andReturn().getResponse();
 
         assertThat(response.getStatus())
@@ -53,32 +58,30 @@ class MedicoControllerTest {
     @DisplayName("Deveria devolver codigo http 200 quando informacoes estao validas")
     @WithMockUser
     void cadastrar_cenario2() throws Exception {
-        var dadosCadastro = new DadosCadastroMedico(
+        var dadosCadastro = new DadosCadastroPaciente(
                 "Medico",
                 "medico@voll.med",
                 "61999999999",
-                "123456",
-                Especialidade.CARDIOLOGIA,
+                "12345678900",
                 dadosEndereco());
 
-        when(repository.save(any())).thenReturn(new Medico(dadosCadastro));
+        when(repository.save(any())).thenReturn(new Paciente(dadosCadastro));
 
         var response = mvc
-                .perform(post("/medicos")
+                .perform(post("/pacientes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(dadosCadastroMedicoJson.write(dadosCadastro).getJson()))
+                        .content(dadosCadastroPacienteJson.write(dadosCadastro).getJson()))
                 .andReturn().getResponse();
 
-        var dadosDetalhamento = new DadosDetalhamentoMedico(
+        var dadosDetalhamento = new DadosDetalhamentoPaciente(
                 null,
                 dadosCadastro.nome(),
                 dadosCadastro.email(),
-                dadosCadastro.crm(),
+                dadosCadastro.cpf(),
                 dadosCadastro.telefone(),
-                dadosCadastro.especialidade(),
                 new Endereco(dadosCadastro.endereco())
         );
-        var jsonEsperado = dadosDetalhamentoMedicoJson.write(dadosDetalhamento).getJson();
+        var jsonEsperado = dadosDetalhamentoPacienteJson.write(dadosDetalhamento).getJson();
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo(jsonEsperado);

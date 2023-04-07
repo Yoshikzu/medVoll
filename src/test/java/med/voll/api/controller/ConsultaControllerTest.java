@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -78,4 +79,12 @@ class ConsultaControllerTest {
         assertThat(response.getContentAsString()).isEqualTo(jsonEsperado);
     }
 
+    @Test
+    @DisplayName("Deveria devolver código http 400 quando informações estão inválidas")
+    @WithMockUser
+    void cancelar_cenario1() throws Exception {
+        var response = mvc.perform(delete("/consultas"))
+                .andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 }
